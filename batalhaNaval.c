@@ -1,52 +1,78 @@
 #include <stdio.h>
 
-#define TAM 10 // Tamanho do tabuleiro
-#define NAVIO 3 // Representação dos navios
+#define BOARD_SIZE 10
+#define SKILL_SIZE 5
+
+// Definição do tabuleiro
+int board[BOARD_SIZE][BOARD_SIZE] = {0};
+
+// Matrizes de habilidade
+int cone[SKILL_SIZE][SKILL_SIZE] = {
+    {0, 0, 0, 0, 0},
+    {0, 0, 1, 0, 0},
+    {0, 1, 1, 1, 0},
+    {1, 1, 1, 1, 1},
+    {0, 0, 0, 0, 0},
+};
+
+int cruz[SKILL_SIZE][SKILL_SIZE] = {
+    {0, 0, 1, 0, 0},
+    {0, 1, 1, 1, 0},
+    {1, 1, 1, 1, 1},
+    {0, 1, 1, 1, 0},
+    {0, 0, 1, 0, 0},
+};
+
+int octaedro[SKILL_SIZE][SKILL_SIZE] = {
+    {0, 0, 1, 0, 0},
+    {0, 1, 1, 1, 0},
+    {1, 1, 1, 1, 1},
+    {0, 1, 1, 1, 0},
+    {0, 0, 1, 0, 0},
+};
+
+// Função para aplicar a matriz de habilidade no tabuleiro
+void apply_skill(int skill[SKILL_SIZE][SKILL_SIZE], int start_row, int start_col) {
+    for (int i = 0; i < SKILL_SIZE; i++) {
+        for (int j = 0; j < SKILL_SIZE; j++) {
+            if (skill[i][j] == 1) {
+                int row = start_row + i - 2; // Centraliza a habilidade
+                int col = start_col + j - 2; // Centraliza a habilidade
+                if (row >= 0 && row < BOARD_SIZE && col >= 0 && col < BOARD_SIZE) {
+                    board[row][col] = 5; // Marcando a área afetada
+                }
+            }
+        }
+    }
+}
 
 // Função para exibir o tabuleiro
-void exibirTabuleiro(int tabuleiro[TAM][TAM]) {
-    for (int i = 0; i < TAM; i++) {
-        for (int j = 0; j < TAM; j++) {
-            printf("%2d ", tabuleiro[i][j]);
+void display_board() {
+    for (int i = 0; i < BOARD_SIZE; i++) {
+        for (int j = 0; j < BOARD_SIZE; j++) {
+            if (board[i][j] == 0) {
+                printf("0 "); // Água
+            } else if (board[i][j] == 3) {
+                printf("3 "); // Navio
+            } else if (board[i][j] == 5) {
+                printf("5 "); // Área afetada pela habilidade
+            }
         }
         printf("\n");
     }
 }
 
-// Função para posicionar os navios
-int posicionarNavio(int tabuleiro[TAM][TAM], int linha, int coluna, int orientacao, int tamanho) {
-    // Verifica se a posição é válida
-    for (int i = 0; i < tamanho; i++) {
-        int l = linha + (orientacao == 0 ? 0 : (orientacao == 1 ? i : (orientacao == 2 ? i : -i)));
-        int c = coluna + (orientacao == 0 ? i : (orientacao == 1 ? 0 : (orientacao == 2 ? -i : i)));
-        
-        if (l < 0 || l >= TAM || c < 0 || c >= TAM || tabuleiro[l][c] != 0) {
-            return 0; // Posição inválida
-        }
-    }
-    
-    // Posiciona o navio
-    for (int i = 0; i < tamanho; i++) {
-        int l = linha + (orientacao == 0 ? 0 : (orientacao == 1 ? i : (orientacao == 2 ? i : -i)));
-        int c = coluna + (orientacao == 0 ? i : (orientacao == 1 ? 0 : (orientacao == 2 ? -i : i)));
-        tabuleiro[l][c] = NAVIO; // Coloca o navio
-    }
-    return 1; // Posição válida e navio posicionado
-}
-
 int main() {
-    int tabuleiro[TAM][TAM] = {0}; // Inicializa o tabuleiro com água
-    int navioTamanho = 3; // Tamanho fixo do navio
-    int sucesso;
+    // Posicionando navios (exemplo)
+    board[4][4] = 3; // Colocando um navio no tabuleiro
 
-    // Posiciona os navios
-    sucesso = posicionarNavio(tabuleiro, 0, 0, 0, navioTamanho); // Horizontal
-    sucesso &= posicionarNavio(tabuleiro, 2, 2, 1, navioTamanho); // Vertical
-    sucesso &= posicionarNavio(tabuleiro, 5, 5, 2, navioTamanho); // Diagonal para baixo
-    sucesso &= posicionarNavio(tabuleiro, 8, 5, 3, navioTamanho); // Diagonal para cima
+    // Aplicando habilidades
+    apply_skill(cone, 4, 4); // A habilidade Cone a partir da posição (4, 4)
+    apply_skill(cruz, 2, 2); // A habilidade Cruz a partir da posição (2, 2)
+    apply_skill(octaedro, 6, 6); // A habilidade Octaedro a partir da posição (6, 6)
 
-    // Exibe o tabuleiro após o posicionamento dos navios
-    exibirTabuleiro(tabuleiro);
+    // Exibindo o tabuleiro
+    display_board();
 
     return 0;
 }
